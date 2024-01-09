@@ -278,10 +278,6 @@ Welcome to the Instagram Backend!
     }
     ```
 
-## Follow Routes
-
-### Follow User
-
 - **
 
 ## Contributing
