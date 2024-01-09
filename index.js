@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URL, {
+mongoose.connect(process.env.MONGO_URL || "mongodb://localhost:27017/insta-db", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
