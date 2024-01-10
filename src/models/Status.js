@@ -12,7 +12,6 @@ const statusSchema = new mongoose.Schema(
     content: { type: String }, // Can include text or a URL to an image or video
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Like" }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
-    // Add other fields as needed
   },
   {
     timestamps: true,

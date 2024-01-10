@@ -42,6 +42,7 @@ exports.getStatuses = async (req, res) => {
       .skip(skip)
       .limit(size);
 
+      
     const totalStatuses = await Status.countDocuments({});
 
     const statusWithCounts = statuses.map((status) => {
