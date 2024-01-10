@@ -11,6 +11,9 @@ exports.likeStatus = async (req, res) => {
     if (!status || !status.postedBy) {
       return res.status(404).json({ error: "Status not found" });
     }
+    if (status && status.postedBy.toString().indexOf(userId) !== -1) {
+      return res.status(404).json({ error: "You cant like your own post" });
+    }
 
     const posterId = status.postedBy.toString();
     const isFollowing = await Follow.exists({ followerId: userId, followingId: posterId });
