@@ -6,6 +6,7 @@ const authRoutes = require("./src/routes/authRoutes");
 const statusRoutes = require("./src/routes/statusRoutes");
 const followRoutes = require("./src/routes/followRoutes");
 const userRoutes = require("./src/routes/userRoutes");
+const { swaggerUi, specs } = require('./swagger');
 
 const app = express();
 
@@ -28,6 +29,9 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/status", statusRoutes);
 app.use("/follow", followRoutes);
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Start server
 const PORT = process.env.PORT || 3001;
