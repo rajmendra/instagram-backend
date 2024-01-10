@@ -6,6 +6,7 @@ const statusSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     type: { type: String, enum: ["text", "image", "video"], required: true },
     content: { type: String }, // Can include text or a URL to an image or video
@@ -17,6 +18,7 @@ const statusSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+statusSchema.index({ createdAt: 1 });
 const Status = mongoose.model("Status", statusSchema);
 
 module.exports = Status;

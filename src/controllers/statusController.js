@@ -22,9 +22,15 @@ exports.postStatus = async (req, res) => {
   }
 };
 
-const getStatuses = async (query, res) => {
+exports.getStatuses = async (req, res) => {
   try {
-    const statuses = await Status.find(query)
+    const { page, pageSize } = req.query;
+    const pageNumber = parseInt(page, 10) || 1;
+    const size = parseInt(pageSize, 10) || 10;
+
+    const skip = (pageNumber - 1) * size;
+    
+    const statuses = await Status.find({})
       .populate({
         path: "postedBy",
         select: "username fullName profilePicture",
@@ -32,7 +38,11 @@ const getStatuses = async (query, res) => {
       .populate("likes comments")
       .populate({ path: "likes", populate: { path: "userId" } })
       .populate({ path: "comments", populate: { path: "userId" } })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(size);
+
+    const totalStatuses = await Status.countDocuments({});
 
     const statusWithCounts = statuses.map((status) => {
       const totalLikes = status.likes.length;
@@ -40,26 +50,14 @@ const getStatuses = async (query, res) => {
       return { ...status.toObject(), totalLikes, totalComments };
     });
 
-    res.status(200).json({ statuses: statusWithCounts });
+    res.status(200).json({
+      statuses: statusWithCounts,
+      totalPages: Math.ceil(totalStatuses / size),
+      currentPage: page,
+    });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-exports.getUserStatuses = async (req, res) => {
-  await getStatuses({}, res);
-};
-
-exports.getViewableStatuses = async (req, res) => {
-  const { userId } = req.user;
-
-  const following = await Follow.find({ followerId: userId }, "followingId");
-  const followers = await Follow.find({ followingId: userId }, "followerId");
-
-  const followingUserIds = following.map((follow) => follow.followingId);
-  const followersUserIds = followers.map((follow) => follow.followerId);
-
-  const viewableUserIds = [...followingUserIds, ...followersUserIds];
-
-  await getStatuses({ userId: { $in: viewableUserIds } }, res);
-};

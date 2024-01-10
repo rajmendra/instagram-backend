@@ -6,11 +6,13 @@ const followSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true, 
     },
     followingId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
   },
   {
@@ -18,6 +20,7 @@ const followSchema = new mongoose.Schema(
   },
 );
 
+followSchema.index({ createdAt: 1 });
 const Follow = mongoose.model("Follow", followSchema);
 
 module.exports = Follow;
