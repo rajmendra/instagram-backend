@@ -6,24 +6,24 @@ const getAllStatusLikesAndComments = async (req, res) => {
           from: "likes",
           localField: "_id",
           foreignField: "statusId",
-          as: "likes"
-        }
+          as: "likes",
+        },
       },
       {
         $lookup: {
           from: "comments",
           localField: "_id",
           foreignField: "statusId",
-          as: "comments"
-        }
+          as: "comments",
+        },
       },
       {
         $project: {
           _id: 1,
           totalLikes: { $size: "$likes" },
-          totalComments: { $size: "$comments" }
-        }
-      }
+          totalComments: { $size: "$comments" },
+        },
+      },
     ]);
 
     res.json(statusCounts);

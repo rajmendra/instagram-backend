@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema(
     bio: { type: String },
     profilePicture: { type: String },
     followerCount: {
-      type: Number
-    }
+      type: Number,
+    },
   },
   {
     timestamps: true,

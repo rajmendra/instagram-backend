@@ -1,15 +1,15 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const config = require("../../config");
 
 module.exports = (req, res, next) => {
   // Get the token from the request header
-  const token = req.header('auth-token');
+  const token = req.header("auth-token");
 
   // Check if token is present
   if (!token) {
     return res
       .status(401)
-      .json({ message: 'Access denied. Token not provided.' });
+      .json({ message: "Access denied. Token not provided." });
   }
 
   try {
@@ -18,6 +18,6 @@ module.exports = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(400).json({ message: 'Invalid token' });
+    res.status(400).json({ message: "Invalid token" });
   }
 };

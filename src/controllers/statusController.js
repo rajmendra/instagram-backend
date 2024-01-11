@@ -8,12 +8,12 @@ exports.postStatus = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { type, content } = req.body;
-    if(type === 'text' && (!content || !content.trim())){
-      next('Content can not be empty');
+    if (type === "text" && (!content || !content.trim())) {
+      next("Content can not be empty");
       return;
     }
-    if(type !== 'text' && (!req.file)){
-      next('Content can not be empty');
+    if (type !== "text" && !req.file) {
+      next("Content can not be empty");
       return;
     }
     let data = content;
@@ -36,7 +36,7 @@ exports.getStatuses = async (req, res) => {
     const size = parseInt(pageSize, 10) || 10;
 
     const skip = (pageNumber - 1) * size;
-    
+
     const statuses = await Status.find({})
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -49,7 +49,6 @@ exports.getStatuses = async (req, res) => {
       .populate({ path: "likes", populate: { path: "userId" } })
       .populate({ path: "comments", populate: { path: "userId" } });
 
-      
     const totalStatuses = await Status.countDocuments({});
 
     const statusWithCounts = statuses.map((status) => {
@@ -68,4 +67,3 @@ exports.getStatuses = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-

@@ -12,12 +12,15 @@ const checkFollowing = async (req, res, next) => {
     }
 
     const posterId = status.postedBy._id.toString();
-    if(posterId === userId){
+    if (posterId === userId) {
       next();
       return;
     }
     // Check if the user is following the poster
-    const isFollowing = await Follow.exists({ followerId: userId, followingId: posterId });
+    const isFollowing = await Follow.exists({
+      followerId: userId,
+      followingId: posterId,
+    });
     if (!isFollowing) {
       return res.status(403).json({ error: "Please follow the user first" });
     }

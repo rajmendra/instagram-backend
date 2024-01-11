@@ -19,12 +19,12 @@ exports.updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
     const { fullName, bio } = req.body;
-    if((!fullName || !fullName.trim())){
-      next('fullName can not be empty');
+    if (!fullName || !fullName.trim()) {
+      next("fullName can not be empty");
       return;
     }
-    if((!bio || !bio.trim())){
-      next('bio can not be empty');
+    if (!bio || !bio.trim()) {
+      next("bio can not be empty");
       return;
     }
     let profilePicture;

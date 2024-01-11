@@ -6,13 +6,13 @@ const likeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true, 
+      index: true,
     },
     statusId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Status",
       required: true,
-      index: true, 
+      index: true,
     },
   },
   {

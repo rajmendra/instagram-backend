@@ -7,13 +7,14 @@ exports.likeStatus = async (req, res) => {
   try {
     const { userId, statusId } = req.params;
 
-
     const existingLike = await Like.findOneAndDelete({ userId, statusId });
     if (existingLike) {
       res.status(200).json({ message: "Status unliked successfully" });
     } else {
       const newLike = await Like.create({ userId, statusId });
-      await Status.findByIdAndUpdate(statusId, { $push: { likes: newLike._id } });
+      await Status.findByIdAndUpdate(statusId, {
+        $push: { likes: newLike._id },
+      });
       res.status(201).json({ message: "Status liked successfully" });
     }
   } catch (error) {

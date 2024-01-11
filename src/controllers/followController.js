@@ -21,12 +21,11 @@ exports.followUser = async (req, res) => {
     if (existingFollow) {
       // If already following, unfollow
       await Follow.deleteOne({ _id: existingFollow._id });
-    }else{
-    // If not following, follow
-    const newFollow = new Follow({ followerId, followingId });
-    await newFollow.save();
+    } else {
+      // If not following, follow
+      const newFollow = new Follow({ followerId, followingId });
+      await newFollow.save();
     }
-
 
     await updateFollowerCount(followingId);
 
