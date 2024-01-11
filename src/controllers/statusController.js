@@ -4,11 +4,18 @@ const Like = require("../models/Like");
 const Comment = require("../models/Comment");
 const uploadImage = require("../utils/uploadImage");
 
-exports.postStatus = async (req, res) => {
+exports.postStatus = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { type, content } = req.body;
-
+    if(type === 'text' && (!content || !content.trim())){
+      next('Content can not be empty');
+      return;
+    }
+    if(type !== 'text' && (!req.file)){
+      next('Content can not be empty');
+      return;
+    }
     let data = content;
     if (req.file) {
       data = await uploadImage(req.file);
@@ -31,16 +38,16 @@ exports.getStatuses = async (req, res) => {
     const skip = (pageNumber - 1) * size;
     
     const statuses = await Status.find({})
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(size)
       .populate({
         path: "postedBy",
-        select: "username fullName profilePicture",
+        select: "username fullName profilePicture followerCount",
       })
       .populate("likes comments")
       .populate({ path: "likes", populate: { path: "userId" } })
-      .populate({ path: "comments", populate: { path: "userId" } })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(size);
+      .populate({ path: "comments", populate: { path: "userId" } });
 
       
     const totalStatuses = await Status.countDocuments({});

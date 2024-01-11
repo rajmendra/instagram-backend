@@ -2,14 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const config = require("../../config");
-const { v4: uuidv4 } = require("uuid"); // For generating unique filenames
-const cloudinary = require("cloudinary").v2; // Use your chosen cloudinary library
-
-cloudinary.config({
-  cloud_name: "your-cloud-name",
-  api_key: "your-api-key",
-  api_secret: "your-api-secret",
-});
+const { v4: uuidv4 } = require("uuid");
 
 exports.registerUser = async (req, res) => {
   try {

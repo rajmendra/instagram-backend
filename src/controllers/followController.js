@@ -1,4 +1,15 @@
 const Follow = require("../models/Follow");
+const User = require("../models/User");
+
+// Function to update follower count in the User table
+async function updateFollowerCount(userId) {
+  try {
+    const followerCount = await Follow.countDocuments({ followingId: userId });
+    await User.findByIdAndUpdate(userId, { $set: { followerCount } });
+  } catch (error) {
+    console.error("Error updating follower count:", error);
+  }
+}
 
 exports.followUser = async (req, res) => {
   try {
@@ -10,14 +21,16 @@ exports.followUser = async (req, res) => {
     if (existingFollow) {
       // If already following, unfollow
       await Follow.deleteOne({ _id: existingFollow._id });
-      return res.status(200).json({ message: "User unfollowed successfully" });
-    }
-
+    }else{
     // If not following, follow
     const newFollow = new Follow({ followerId, followingId });
     await newFollow.save();
+    }
 
-    res.status(201).json({ message: "User followed successfully" });
+
+    await updateFollowerCount(followingId);
+
+    res.status(201).json({ message: "ok" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
