@@ -8,12 +8,18 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.get(
-  "/profile/:userId",
+  "/:userId",
   authenticateMiddleware,
   userController.getUserProfileById,
 );
+
+router.get(
+  "/:userId/likes",
+  authenticateMiddleware,
+  userController.getUserLikes,
+);
 router.put(
-  "/profile/:userId",
+  "/:userId",
   authenticateMiddleware,
   upload.single("file"),
   userController.updateUser,

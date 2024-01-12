@@ -1,15 +1,27 @@
 const User = require("../models/User");
+const Like = require("../models/Like");
 const { v4: uuidv4 } = require("uuid");
 const uploadImage = require("../utils/uploadImage");
 
 exports.getUserProfileById = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log("userId", userId);
     const user = await User.findOne({ _id: userId });
-
-    console.log("user", user);
     res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.getUserLikes = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const likes = await Like.find({ userId })
+    .populate({
+      path: "statusId",
+      select: "_id postedBy type content",
+    });
+    res.status(200).json({ likes });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
