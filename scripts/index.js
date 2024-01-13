@@ -6,158 +6,126 @@ const Follow = require("../src/models/Follow");
 const Comment = require("../src/models/Comment");
 const Like = require("../src/models/Like");
 
-mongoose.connect(
-  "mongodb+srv://insta_user:13so8vrHzIaxFMyo@cluster0.3ymbnfr.mongodb.net/instadb",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-);
+mongoose.connect("mongodb+srv://insta_user:13so8vrHzIaxFMyo@cluster0.3ymbnfr.mongodb.net/instadb", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 mongoose.connection.on("connected", () => {
   console.log("Connected to MongoDB");
-
   generateData();
 });
-async function createUserAndStatus() {
-  for (let i = 0; i < 1000; i++) {
-    try {
-      const user = {
-        username: faker.internet.userName(),
-        password:
-          "$2b$10$OnPIlU8fzEPXei6UKc83yuCxDRLcZ6dBxbiAn.4olleuLJrkRTl7a", // 123456 this is the default password for all
-        fullName: faker.person.fullName(),
-        email: faker.internet.email(),
-        bio: faker.person.bio(),
-        profilePicture: faker.image.avatar(),
-      };
 
-      const newUser = new User(user);
-      console.log("user", user);
-      console.log("================================================");
-      console.log("i", i);
-      await newUser.save();
-    } catch (e) {
-      console.log(e);
-    }
+async function createUserAndStatus() {
+  const users = [];
+  for (let i = 0; i < 1000; i++) {
+    const user = {
+      username: faker.internet.userName(),
+      password:
+        "$2b$10$OnPIlU8fzEPXei6UKc83yuCxDRLcZ6dBxbiAn.4olleuLJrkRTl7a", // 123456 this is the default password for all
+      fullName: faker.person.fullName(),
+      email: faker.internet.email(),
+      bio: faker.person.bio(),
+      profilePicture: faker.image.avatar(),
+    };
+    users.push(user);
   }
 
   console.log("User Data Generation Finished");
+  await User.insertMany(users);
 
   // Now, let's generate status data
-  const users = await User.find({});
-  console.log("users", users.length);
-
-  const statusPromises = users.map(async (u) => {
-    const statuses = [];
+  const statuses = [];
+  const allUsers = await User.find({});
+  for (const user of allUsers) {
     for (let i = 0; i < 5; i++) {
-      statuses.push(
-        new Status({
-          postedBy: u._id,
-          type: "image",
-          content: faker.image.url(),
-        }),
-      );
-    }
-    console.log("user", u);
-    console.log("================================================");
-    await Status.insertMany(statuses);
-  });
-
-  return Promise.all(statusPromises);
-}
-async function createFollowData() {
-  const users_s = await User.find({});
-  console.log("users_s", users_s.length);
-  const min = 1;
-  const max = 1000;
-
-  for (let i = 0; i < users_s.length; i++) {
-    const randomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
-    const random_users = await User.find().skip(randomInteger).limit(10);
-
-    const followPromises = random_users.map(async (u) => {
-      // Check if the follow already exists
-      const existingFollow = await Follow.findOne({
-        followerId: users_s[i]._id,
-        followingId: u._id,
+      statuses.push({
+        postedBy: user._id,
+        type: "image",
+        content: faker.image.url(),
       });
-
-      if (!existingFollow) {
-        // Create a new follow only if it doesn't already exist
-        await Follow.create({
-          followerId: users_s[i]._id,
-          followingId: u._id,
-        });
-      }
-    });
-
-    console.log("Creating follow", users_s[i]._id);
-    await Promise.all(followPromises);
+    }
   }
-  console.log("Follow Data Generation Finished");
-  return Promise.resolve({});
+
+  console.log("Status Data Generation Finished");
+  await Status.insertMany(statuses);
 }
+
+async function createFollowData() {
+  const allUsers = await User.find({});
+  for (const user of allUsers) {
+    const randomInteger = Math.floor(Math.random() * allUsers.length);
+    const randomUsers = allUsers
+      .filter((_, index) => index !== randomInteger)
+      .slice(0, 10);
+
+    const followData = randomUsers.map((randomUser) => ({
+      followerId: user._id,
+      followingId: randomUser._id,
+    }));
+
+    await Follow.insertMany(followData);
+  }
+
+  console.log("Follow Data Generation Finished");
+}
+
 async function createLikeAndComment() {
   console.log("Updating Likes and Status...");
 
-  const users_s = await User.find({});
-  console.log("users_s", users_s.length);
-  // Generate like and comment data
-  const statuses_s = await Status.find({});
-  console.log("statuses_s", statuses_s.length);
+  const allUsers = await User.find({});
+  const allStatuses = await Status.find({});
 
-  const likeAndCommentPromises = statuses_s.map(async (s) => {
-    // Generate 5 likes for each status
-    const likeIds = [];
-    const likePromises = Array.from({ length: 5 }, async () => {
-      const randomUser = users_s[Math.floor(Math.random() * users_s.length)];
-      const like = await Like.create({
+  const likeAndCommentData = allStatuses.flatMap((status) => {
+    const likeData = Array.from({ length: 5 }, () => {
+      const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
+      return {
         userId: randomUser._id,
-        statusId: s._id,
-      });
-      likeIds.push(like._id);
+        statusId: status._id,
+      };
     });
-    // Generate 5 comments for each status
-    const commentIds = [];
-    const commentPromises = Array.from({ length: 5 }, async () => {
-      const randomUser = users_s[Math.floor(Math.random() * users_s.length)];
-      const comment = await Comment.create({
+
+    const commentData = Array.from({ length: 5 }, () => {
+      const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
+      return {
         userId: randomUser._id,
-        statusId: s._id,
+        statusId: status._id,
         content: faker.lorem.sentence(),
-      });
-      commentIds.push(comment._id);
+      };
     });
 
-    console.log("Creating likes and comments for", s._id);
-    await Promise.all([...likePromises, ...commentPromises]);
-    // Update Status model with like and comment IDs
-
-    console.log("Updating likes and comments for", s._id);
-    await Status.findByIdAndUpdate(s._id, {
-      $push: { likes: { $each: likeIds }, comments: { $each: commentIds } },
-    });
+    return [...likeData, ...commentData];
   });
 
-  return Promise.all(likeAndCommentPromises);
-}
-async function updateFollows() {
-  const users_s = await User.find({});
-  console.log("users_s", users_s.length);
-  console.log("Updating follows...");
+  console.log("Creating Likes and Comments...");
+  await Promise.all([
+    Like.insertMany(likeAndCommentData.slice(0, likeAndCommentData.length / 2)),
+    Comment.insertMany(likeAndCommentData.slice(likeAndCommentData.length / 2)),
+  ]);
 
-  for (let i = 0; i < users_s.length; i++) {
-    const followingUser = await User.findById(users_s[i]._id);
-    const updatedFollowerCount = await Follow.countDocuments({
-      followingId: followingUser._id,
-    });
-    await User.findByIdAndUpdate(users_s[i]._id, {
-      followerCount: updatedFollowerCount,
-    });
+  console.log("Updating Likes and Comments for Statuses...");
+  await Promise.all(
+    allStatuses.map((status) =>
+      Status.findByIdAndUpdate(status._id, {
+        $push: {
+          likes: { $each: likeAndCommentData.slice(0, likeAndCommentData.length / 2).map((l) => l._id) },
+          comments: { $each: likeAndCommentData.slice(likeAndCommentData.length / 2).map((c) => c._id) },
+        },
+      })
+    )
+  );
+}
+
+async function updateFollows() {
+  console.log("Updating Follows...");
+
+  const allUsers = await User.find({});
+  for (const user of allUsers) {
+    const updatedFollowerCount = await Follow.countDocuments({ followingId: user._id });
+    await User.findByIdAndUpdate(user._id, { followerCount: updatedFollowerCount });
   }
 
-  return Promise.resolve({});
+  console.log("Follows Update Finished");
 }
 
 async function generateData() {
@@ -166,6 +134,7 @@ async function generateData() {
   await Follow.deleteMany({});
   await Comment.deleteMany({});
   await Like.deleteMany({});
+
   try {
     await createUserAndStatus();
     await createFollowData();
@@ -176,6 +145,6 @@ async function generateData() {
   } catch (error) {
     console.error("Error:", error);
   } finally {
-    mongoose.disconnect(); // Close the MongoDB connection after the script finishes
+    mongoose.disconnect();
   }
 }

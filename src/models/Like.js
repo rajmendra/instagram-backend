@@ -19,7 +19,6 @@ const likeSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
-likeSchema.index({ createdAt: 1 });
 const Like = mongoose.model("Like", likeSchema);
 
 module.exports = Like;

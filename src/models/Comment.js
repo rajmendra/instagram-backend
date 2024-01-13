@@ -5,8 +5,8 @@ const commentSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      index: true,
       required: true,
+      index: true,
     },
     statusId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -14,13 +14,13 @@ const commentSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    content: { type: String, required: true },
+    content: { type: String, required: true, maxlength: 1000 }, // Set an appropriate max length
   },
   {
     timestamps: true,
-  },
+  }
 );
-commentSchema.index({ createdAt: 1 });
+
 const Comment = mongoose.model("Comment", commentSchema);
 
 module.exports = Comment;

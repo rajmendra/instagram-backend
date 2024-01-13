@@ -2,22 +2,35 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const config = require("../../config");
-const { v4: uuidv4 } = require("uuid");
 
+/**
+ * Registers a new user in the system.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
 exports.registerUser = async (req, res) => {
   try {
     const { username, password, fullName, email, bio } = req.body;
-    const already_exists = await User.findOne({ username });
-    if (already_exists) {
-      res.status(500).json({ error: "Username already exists" });
-      return;
-    }
-    const email_exists = await User.findOne({ email });
-    if (email_exists) {
-      res.status(500).json({ error: "Email already exists" });
-      return;
+
+    // Check if the username and email already exist in the database
+    const [alreadyExists, emailExists] = await Promise.all([
+      User.exists({ username }),
+      User.exists({ email }),
+    ]);
+
+    // If the username or email already exists, return an error response
+    if (alreadyExists) {
+      return res.status(500).json({ error: "Username already exists" });
     }
 
+    if (emailExists) {
+      return res.status(500).json({ error: "Email already exists" });
+    }
+
+    // Hash the user's password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username,
@@ -26,88 +39,45 @@ exports.registerUser = async (req, res) => {
       email,
       bio,
     });
+
+    // Save the new user to the database
     await newUser.save();
 
-    console.log("username", username);
+    // Respond with a success message
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ error: error });
-  }
-};
-
-exports.loginUser = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-
-    if (!user) {
-      return res.status(401).json({ error: "Invalid username or password" });
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return res.status(401).json({ error: "Invalid username or password" });
-    }
-
-    const token = jwt.sign({ userId: user._id }, config.jwtSecret, {
-      expiresIn: "24h",
-    });
-
-    res.status(200).json({ userId: user._id, token });
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }
-};
-
-exports.uploadProfilePicture = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-
-    // Upload the image to a third-party service (Cloudinary in this example)
-    const result = await cloudinary.uploader.upload(
-      req.file.buffer.toString("base64"),
-      {
-        folder: "profile-pictures",
-        public_id: `${uuidv4()}-${req.file.originalname}`,
-      },
-    );
-
-    // Update the user's profile picture URL in the database
-    const { userId } = req.user;
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { profilePicture: result.secure_url },
-      { new: true },
-    );
-
-    res.status(200).json({
-      message: "Profile picture uploaded successfully",
-      user: updatedUser,
-    });
-  } catch (error) {
+    // Handle internal server error
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-exports.editProfile = async (req, res) => {
+/**
+ * Authenticates and logs in a user.
+ *
+ * @function
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ */
+exports.loginUser = async (req, res) => {
   try {
-    const { userId } = req.user;
-    const { fullName, email, bio, profilePicture } = req.body;
+    const { username, password } = req.body;
+    const user = await User.findOne({ username }).lean();
 
-    // Update the user's profile information
-    const updatedProfile = await User.findByIdAndUpdate(
-      userId,
-      { fullName, email, bio, profilePicture },
-      { new: true }, // To return the updated document
-    );
+    // Check if the user exists and the provided password is correct
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ error: "Invalid username or password" });
+    }
 
-    res
-      .status(200)
-      .json({ message: "Profile updated successfully", user: updatedProfile });
+    // Generate a JWT token for the authenticated user
+    const token = jwt.sign({ userId: user._id }, config.jwtSecret, {
+      expiresIn: "10d",
+    });
+
+    // Respond with the user's ID and the generated token
+    res.status(200).json({ userId: user._id, token });
   } catch (error) {
+    console.log('error', error)
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

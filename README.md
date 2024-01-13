@@ -1,293 +1,109 @@
-# Instagram Backend
+Certainly! Here's the updated README with a placeholder for Swagger documentation:
 
-Welcome to the Instagram Backend!
+````markdown
+# Instagram Backend API
 
-## Prerequisites
+## Overview
 
-- Node.js installed
-- MongoDB or any other database system
+The Instagram Backend API is a comprehensive backend solution for a social media application. It provides endpoints for user management, status posting, likes, comments, and more.
+
+## Table of Contents
+
+1. [Getting Started](#getting-started)
+   - [Prerequisites](#prerequisites)
+   - [Installation](#installation)
+2. [API Documentation](#api-documentation)
+   - [Swagger Documentation](#swagger-documentation)
+   - [User Operations](#user-operations)
+   - [Status Operations](#status-operations)
+   - [Follow Operations](#follow-operations)
+   - [Like and Comment Operations](#like-and-comment-operations)
+3. [Usage](#usage)
+   - [Authentication](#authentication)
+   - [Endpoints](#endpoints)
+4. [Contributing](#contributing)
+5. [License](#license)
 
 ## Getting Started
 
-1. **Clone the repository:**
+### Prerequisites
+
+- Node.js
+- MongoDB
+
+### Installation
+
+1. Clone the repository:
 
    ```bash
-   git clone https://github.com/rajmendra/instagram-backend.git
+   git clone [repository-url]
    ```
+````
 
-2. **Navigate to the project directory:**
+2. Install dependencies:
 
    ```bash
    cd instagram-backend
-   ```
-
-3. **Install dependencies:**
-
-   ```bash
    npm install
    ```
 
-4. **Set up environment variables:**
-   Create a `.env` file in the root of your project with the following content:
+3. Set up your MongoDB connection in `.env` file.
 
    ```env
-   PORT=3001
-   MONGO_URL=your_mongodb_connection_string
-   SECRET_KEY=your_secret_key_for_jwt
+   MONGODB_URI=[your-mongodb-uri]
    ```
 
-5. **Start the server:**
+   Replace `[your-mongodb-uri]` and `[your-jwt-secret]` with your MongoDB connection string and a secret key for JWT.
+
+4. Start the server:
 
    ```bash
    npm start
    ```
 
-6. The backend will be running at `http://localhost:3001` by default.
+## API Documentation
 
-# API Documentation
+### Swagger Documentation
 
-## Auth Routes
+Explore the API using Swagger: [Swagger Documentation](#swagger-url-here)
 
-### Register a New User
+### User Operations
 
-- **Endpoint:** `POST /auth/register`
-- **Description:** Registers a new user.
-- **Request Body:**
-  - Example:
-    ```json
-    {
-      "username": "example_user",
-      "password": "example_password",
-      "email": "user@example.com"
-    }
-    ```
-- **Response:**
-  - Status: 201 Created
-  - Example:
-    ```json
-    {
-      "message": "User registered successfully"
-    }
-    ```
+- [Register a User](#register-a-user)
+- [Login](#login)
+- [Update User Profile](#update-user-profile)
+- [Upload Profile Picture](#upload-profile-picture)
 
-### Login
+### Status Operations
 
-- **Endpoint:** `POST /auth/login`
-- **Description:** Logs in an existing user.
-- **Request Body:**
-  - Example:
-    ```json
-    {
-      "username": "example_user",
-      "password": "example_password"
-    }
-    ```
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    {
-      "token": "example_token",
-      "userId": "example_user_id"
-    }
-    ```
+- [Post a Status](#post-a-status)
+- [Get Statuses](#get-statuses)
+- [Like a Status](#like-a-status)
+- [Comment on a Status](#comment-on-a-status)
 
-### Edit Profile
+### Follow Operations
 
-- **Endpoint:** `PUT /auth/edit-profile`
-- **Description:** Edits the user's profile.
-- **Request Body:**
-  - Example:
-    ```json
-    {
-      "fullName": "New Full Name",
-      "bio": "New bio information"
-    }
-    ```
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    {
-      "message": "Profile updated successfully"
-    }
-    ```
+- [Follow a User](#follow-a-user)
+- [Get Following List](#get-following-list)
 
-### Upload Profile Picture
+### Like and Comment Operations
 
-- **Endpoint:** `POST /auth/upload-profile-picture`
-- **Description:** Uploads a new profile picture.
-- **Request Body:** Form data with a single file named "profilePicture".
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    {
-      "message": "Profile picture uploaded successfully"
-    }
-    ```
+- [Get User Likes](#get-user-likes)
+- [Comment on a Status](#comment-on-a-status)
 
-## User Routes
+## Usage
 
-### Get User Profile
+### Authentication
 
-- **Endpoint:** `GET /user/profile/:userId`
-- **Description:** Retrieves the profile of a specific user.
-- **Parameters:**
-  - `userId`: The ID of the user.
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    {
-      "username": "example_user",
-      "fullName": "Example User",
-      "bio": "This is an example bio",
-      "profilePicture": "example_profile_picture_url"
-    }
-    ```
+Most API endpoints require authentication using a JWT token. Include the token in the `auth-token` header.
 
-### Update User
+### Endpoints
 
-- **Endpoint:** `PUT /user/profile/:userId`
-- **Description:** Updates the profile of a specific user.
-- **Parameters:**
-  - `userId`: The ID of the user.
-- **Request Body:**
-  - Example:
-    ```json
-    {
-      "fullName": "Updated Full Name",
-      "bio": "Updated bio information"
-    }
-    ```
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    {
-      "message": "User profile updated successfully"
-    }
-    ```
-
-## Status Routes
-
-### Get User Statuses
-
-- **Endpoint:** `GET /status/`
-- **Description:** Retrieves statuses of the authenticated user.
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    [
-      {
-        "statusId": "example_status_id",
-        "content": "This is an example status",
-        "createdAt": "2022-01-01T12:34:56.789Z",
-        "likesCount": 5,
-        "commentsCount": 3,
-        "user": {
-          "userId": "example_user_id",
-          "username": "example_user",
-          "fullName": "Example User",
-          "profilePicture": "example_profile_picture_url"
-        }
-      }
-      // ... more statuses
-    ]
-    ```
-
-### Post New Status
-
-- **Endpoint:** `POST /status/:userId`
-- **Description:** Posts a new status for a specific user.
-- **Parameters:**
-  - `userId`: The ID of the user.
-- **Request Body:**
-  - Form data with a single file named "file" for attachments (image, video, etc.).
-- **Response:**
-  - Status: 201 Created
-  - Example:
-    ```json
-    {
-      "message": "Status posted successfully",
-      "statusId": "newly_created_status_id"
-    }
-    ```
-
-### Get Viewable Statuses
-
-- **Endpoint:** `GET /status/viewable`
-- **Description:** Retrieves statuses visible to the authenticated user based on their followers.
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    [
-      {
-        "statusId": "example_status_id",
-        "content": "This is a viewable status",
-        "createdAt": "2022-01-02T10:20:30.456Z",
-        "likesCount": 2,
-        "commentsCount": 1,
-        "user": {
-          "userId": "another_user_id",
-          "username": "another_user",
-          "fullName": "Another User",
-          "profilePicture": "another_user_profile_picture_url"
-        }
-      }
-      // ... more statuses
-    ]
-    ```
-
-### Like a Status
-
-- **Endpoint:** `POST /status/:userId/like/:statusId`
-- **Description:** Likes a specific status.
-- **Parameters:**
-  - `userId`: The ID of the user performing the like.
-  - `statusId`: The ID of the status to be liked.
-- **Response:**
-  - Status: 200 OK
-  - Example:
-    ```json
-    {
-      "message": "Status liked successfully"
-    }
-    ```
-
-### Comment on a Status
-
-- **Endpoint:** `POST /status/:userId/comment/:statusId`
-- **Description:** Adds a comment to a specific status.
-- **Parameters:**
-  - `userId`: The ID of the user making the comment.
-  - `statusId`: The ID of the status to be commented on.
-- **Request Body:**
-  - Example:
-    ```json
-    {
-      "text": "This is a comment on the status."
-    }
-    ```
-- **Response:**
-
-  - Status: 201 Created
-  - Example:
-    ```json
-    {
-      "message": "Comment added successfully",
-      "commentId": "newly_created_comment_id"
-    }
-    ```
-
-- \*\*
+See [API Documentation](#api-documentation) for detailed information on each endpoint.
 
 ## Contributing
 
-Explain how others can contribute to your backend project.
+Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
@@ -295,5 +111,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 ```
 
-Make sure to replace placeholder texts such as `rajmendra`, `instagram-backend`, etc., with the actual details of your repositories and application. Provide specific details about the project structure, API documentation, how others can contribute, and any additional information you think is relevant to your backend project.
+Replace `[swagger-url-here]` with the actual URL where your Swagger documentation is hosted.
 ```

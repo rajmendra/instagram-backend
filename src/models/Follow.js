@@ -20,7 +20,6 @@ const followSchema = new mongoose.Schema(
   },
 );
 
-followSchema.index({ createdAt: 1 });
 const Follow = mongoose.model("Follow", followSchema);
 
 module.exports = Follow;

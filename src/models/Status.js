@@ -10,8 +10,10 @@ const statusSchema = new mongoose.Schema(
     },
     type: { type: String, enum: ["text", "image", "video"], required: true },
     content: { type: String }, // Can include text or a URL to an image or video
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Like" }],
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Like" ,
+    index: true,}],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment",
+    index: true, }],
   },
   {
     timestamps: true,
