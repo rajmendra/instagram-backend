@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("../../config");
+const config = require("../config");
 
 /**
  * Middleware to authenticate requests using JSON Web Tokens (JWT).
@@ -12,7 +12,7 @@ const config = require("../../config");
  */
 module.exports = (req, res, next) => {
   // Get the token from the request header
-  const token = req.header("auth-token");
+  const token = req.header("Authorization");
 
   // Check if token is present
   if (!token) {

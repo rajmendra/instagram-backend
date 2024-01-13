@@ -70,7 +70,6 @@ describe("Follow Router", () => {
         .send(requestBody);
 
       expect(response.status).toBe(201);
-      // Add more assertions if needed
     });
   });
 });

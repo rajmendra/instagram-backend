@@ -6,7 +6,7 @@ const Follow = require("../src/models/Follow");
 const Comment = require("../src/models/Comment");
 const Like = require("../src/models/Like");
 
-mongoose.connect("mongodb+srv://insta_user:13so8vrHzIaxFMyo@cluster0.3ymbnfr.mongodb.net/instadb", {
+mongoose.connect("mongodb://localhost:27017/insta-db", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -18,7 +18,7 @@ mongoose.connection.on("connected", () => {
 
 async function createUserAndStatus() {
   const users = [];
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 50; i++) {
     const user = {
       username: faker.internet.userName(),
       password:
@@ -93,7 +93,7 @@ async function createLikeAndComment() {
         content: faker.lorem.sentence(),
       };
     });
-
+    console.log('commentData', commentData);
     return [...likeData, ...commentData];
   });
 
