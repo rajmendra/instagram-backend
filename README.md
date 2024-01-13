@@ -8,7 +8,7 @@ The Instagram Clone is a social media platform that mimics the basic functionali
 
 ```plaintext
 app/
-    public/                 # Static files (e.g., images)
+    script/                 # database script to load initial data
     src/                    # Source code
         config/             # Configuration files
         controllers/        # Controller logic for handling requests
@@ -28,13 +28,13 @@ To start the Node.js application, follow these steps:
 1. Clone the repository to your local machine.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/rajmendra/instagram-backend.git
 ```
 
 2. Navigate to the project directory.
 
 ```bash
-cd <project-directory>
+cd instagram-backend
 ```
 
 3. Install dependencies.
@@ -49,7 +49,7 @@ npm install
 npm start
 ```
 
-The application should now be running on [http://localhost:3000](http://localhost:3000).
+The application should now be running on [http://localhost:3001](http://localhost:3001).
 
 ## Swagger API Documentation 📖
 
