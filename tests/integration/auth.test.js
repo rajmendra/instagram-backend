@@ -1,5 +1,5 @@
 
-const { app, server } = require('../../server');
+const { app, server } = require('../..');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');

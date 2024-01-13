@@ -17,7 +17,6 @@ const options = {
       {
         url: "http://localhost:3001",
         url: "https://insta-backend-8xel.onrender.com",
-
       },
     ],
   },
